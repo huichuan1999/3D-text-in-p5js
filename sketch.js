@@ -1,80 +1,104 @@
-//鼠标左键旋转画面，鼠标中键或者按住ctrl平移
+//鼠标左键旋转画面，按住鼠标中键平移画面
+//原始版本：https://editor.p5js.org/huichuan1999/sketches/Mz1FbBpJR 
+//使用json文件加入文本的版本：https://editor.p5js.org/huichuan1999/sketches/kphEC9R9a 
+//将需要的段落粘贴到json文件里， 在这里我将每个空格“ ”作为单词之间的分隔符，将每个句号“.”号作为句子之间的分隔符。文本的末尾不要有空格，不然会将这个空格识别为一个单独的句子增加一个空旋臂
+//每一句话都是一个单独的旋臂，比如，两句话，是双螺旋，三句话，就是三螺旋。
 
-let angle = 0;
-let radius = 100; // 可以增加这个值让两个螺旋之间的距离更远
-let speed = 0.02;
-let ballCount = 40; //有多少个
-let spacing;
+let jsonData;
+let sentencesArray = []; //将句子们存储在这里
+let graphicsArray = []; //将每个独立的单词存放在这里
+let wordWidths = [];     // 存储每一个单词的宽度用于绘制graphics和planes
 let easycam;
+let angle = 0;
+let radius = 200;
+let speed = 0.02;
+let spiralCount;
 
-let title;
-let textContent = "hello world";//在这里改文字内容
-let textLength;
-
-let spiralCount = 1; 
+function preload() {
+  jsonData = loadJSON('json/Revision1.json');
+}
 
 function setup() {
   createCanvas(1000, 600, WEBGL);
   frameRate(60);
-  
-  title = createGraphics(200,100);
-  title.textAlign(CENTER);
-  title.textSize(20);
-  title.textFont("Inter");
-  
-  textLength = title.textWidth(textContent); // 计算文字长度
-  //title = createGraphics(textLength,100);
-  spacing = textLength/2; // 除以2是两个螺旋，除以3是三个螺旋
+  //textSize(20);
+  //text('initializing...', 0, 0);
 
+  let rawText = jsonData.text;
+  let sentences = rawText.split(". "); //用句号来分割每个句子
+  spiralCount = sentences.length;
+
+  for (let i = 0; i < sentences.length; i++) {
+    let words = sentences[i].split(" ");
+    sentencesArray.push(words);
+  
+    let graphics = [];
+    let widths = []; // 为每个句子创建一个新的宽度数组
+  
+    for (let word of words) {
+      let wordWidth = textWidth(word);
+      //let gr = createGraphics(wordWidth, 30); //试图让每一个graphic的宽度等于每个单词的宽度，但是没有成功
+      let gr = createGraphics(120, 30);
+      console.log(wordWidth);
+      gr.textSize(20);
+      gr.textAlign(CENTER, CENTER);
+      gr.text(word, gr.width / 2, gr.height / 2);
+  
+      graphics.push(gr);
+      widths.push(wordWidth);
+    }
+  
+    graphicsArray.push(graphics);
+    wordWidths.push(widths); // 将这个句子的宽度数组添加到wordWidths中
+  }
   easycam = createEasyCam();
 }
+
 function draw() {
   background(250);
-  sphere(3); // 原点
-  
-  let camPos = easycam.getPosition(); // 获取摄像机位置
-  
-  title.clear();
-  title.text(textContent, title.width/2, title.height/2);
-  
-  let state = easycam.getState();//get摄像机的角度
+  let camPos = easycam.getPosition();
+  let state = easycam.getState();
   let rotation = state.rotation;
 
-  for (let i = 0; i < ballCount; i++) {
-    let offset = i * spacing;
-    let spiralIndex = i % spiralCount; // 确定当前平面属于哪个螺旋
-    let z = offset/3; // 计算z轴坐标, 文字和文字之间的间距
-    
-    // 使用不同的方向旋转每个螺旋
-    let angleOffset = spiralIndex === 0 ? angle + offset : -angle - offset;
-    let x = radius * cos(angleOffset);
-    let y = radius * sin(angleOffset);
-    
-    normalMaterial();
-    push();
-    translate(x, y, z);
+  let angleStep = TWO_PI / spiralCount; // 每个螺旋的角度间隔
 
-    let target = createVector(camPos[0], camPos[1], camPos[2]);
-    let dir = target.sub(createVector(x, y, z));
-    let up = createVector(0, 1, 0);
-    applyMatrix(...lookAt(dir, up));
-    
-    texture(title);
-    plane(textLength, 30);
-    pop();
+  for (let i = 0; i < graphicsArray.length; i++) {
+    let spiralAngle = angleStep * i; // 每个螺旋的起始角度，在圆周上等分
+    let directionMultiplier = i % 2 == 0 ? 1 : -1; // 相邻螺旋方向相反（顺时针和逆时针）
+
+    for (let j = 0; j < graphicsArray[i].length; j++) {
+      let offset = j * 50;
+      let z = offset;
+      let angleOffset = angle * directionMultiplier + offset;
+      let x = radius * cos(spiralAngle + angleOffset);
+      let y = radius * sin(spiralAngle + angleOffset);
+
+      push();
+      translate(x, y, z);
+
+      //随时都面向摄像机镜头的方向
+      let target = createVector(camPos[0], camPos[1], camPos[2]);
+      let dir = target.sub(createVector(x, y, z));
+      let up = createVector(0, 1, 0);
+      applyMatrix(...lookAt(dir, up)); 
+      
+      normalMaterial(); //注释掉可以显示plane的边框
+      texture(graphicsArray[i][j]);
+      //plane(wordWidths[i][j], 30); //试图让每一个plane的宽度等于每个单词的宽度，但是没有成功
+      plane(120, 30);
+      pop();
+    }
   }
 
   angle += speed;
 }
 
-
-// 计算LookAt矩阵 让它们旋转的时候面向观众
-function lookAt(direction, up) {
+//让它们面向摄像机的方向
+function lookAt(direction, up) { 
   let z = direction.copy().normalize();
   let x = up.copy().cross(z).normalize();
   let y = z.copy().cross(x);
 
-  // 创建并返回一个适用于applyMatrix的数组
   return [
     x.x, x.y, x.z, 0,
     y.x, y.y, y.z, 0,
