@@ -29,7 +29,8 @@ function setup() {
   spiralCount = sentences.length;
 
   for (let i = 0; i < sentences.length; i++) {
-    let words = sentences[i].split(" ");
+    let words = sentences[i].split(" ").reverse(); // 反转单词顺序
+    //let words = sentences[i].split(" ");
     sentencesArray.push(words);
   
     let graphics = [];
