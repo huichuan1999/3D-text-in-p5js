@@ -1,0 +1,13 @@
+So you’d like to make a protein. 
+
+I want to express a protein from milk, one of the myriads of proteins that gives milk its amino acid composition gives whey its taste and behaviour in baked goods, gives the cheese its texture and springiness, and gives milk its nourishing and immune-boosting properties.
+
+These proteins are present in the milk of all mammals, and their diversity is one factor I’d like to explore. Do they taste differently? Behave differently in the milk? In baked goods? In cheese and ice cream? Do the different proteins from different animals behave differently when they are expressed in a yeast cell? Do they fold properly into their three-dimensional shape? Does the gene get expressed and the protein translated at a high enough level?
+
+
+The program of the protein can also be written thousands of different ways. Each amino acid in the protein is encoded by three letters of DNA, and because there are 64 possible three letter combinations of DNA sequence but only 20 amino acids, most can be written multiple ways. And the choice for which option for each of the amino acids impacts the way that the gene is expressed by the cell. Because different cells have different proportions of the tRNAs that recognize the different three letter combinations. And because the shape of the RNA expressed from the DNA will be different with a different sequence, impacting how it moves and how it interacts with the ribosome. We can try different combinations of codons (the three letter combinations) or we can rely on a model based on what works well in the yeast you want to use from previous experience. 
+
+
+The DNA on its own doesn’t do anything, the DNA must interact with the RNA polymerase inside of the yeast cell to be transcribed into RNA, which can be translated into protein. The DNA sequence needs a region before the protein sequence starts – a promoter – that interacts with the cell’s RNA polymerase. The stronger the interaction, the more it binds and the more of the downstream DNA sequence is expressed. We can test your sequence with different promoters to see how they interact and which one leads to more expression. These promoters can be natural sequences identified from existing evolved organisms or can be designed synthetic sequences. 
+
+Different promoters also need other conditions outside of the cell to be right in order to bind and activate expression. What are the conditions that matter to you?
