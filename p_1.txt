@@ -1,6 +1,0 @@
-So you’d like to make a protein 
-
-I want to express a protein from milk, one of the myriad of proteins that gives milk its amino acid composition, gives whey its taste and behavior in baked goods, gives cheese its texture and springiness, gives milk its nourishing and immune boosting properties .
-
-These proteins are present in the milk of all mammals, and their diversity is one factor I’d like to explore. Do they taste differently? Behave differently in the milk? In baked goods? In cheese and ice cream? Do the different proteins from different animals behave differently when they are expressed in a yeast cell? Do they fold properly into their three dimensional shape? Does the gene get expressed and the protein translated at a high enough level?
-

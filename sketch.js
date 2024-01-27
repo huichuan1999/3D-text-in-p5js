@@ -37,12 +37,22 @@ let state;
 
 let textParagraph;
 let rotateText
+let currentParagraph;
+let textSpace;
+var allPage = [];
+let currentPage;
+let AIText = '';
+let spiral = 0;
+
 
 function preload() {
   jsonData = loadJSON('json/Revision1.json');
+  textParagraph0 = loadStrings('assets/p_0.txt');
   textParagraph1 = loadStrings('assets/p_1.txt');
   textParagraph2 = loadStrings('assets/p_2.txt');
+  textParagraphEmpty = '';
   font = loadFont("assets/Workbench-Regular.ttf"); 
+  font1 = loadFont("assets/SI.ttf"); 
 }
 
 
@@ -55,64 +65,119 @@ function setup() {
 
   enableCam();
 
+  //initial setting
+  currentParagraph = textParagraph0;
+  textSpace = 80;
+  sentenceColor = sentenceColor1;
+  currentPage = 0;
 
 }
 
 function draw() {
   background(0);
-  shuffleParagraph(textParagraph1, sentenceColor1);
-  //spiralVisual();
-  //shuffleParagraph(textParagraph2, sentenceColor2);
-  angleText(textParagraph2[0], 0, 0.8, 0);
+  drawParagraph(currentParagraph, sentenceColor, textSpace);
+  if (spiral == 1) {
+    spiralVisual();
+  }
+  bigText(AIText);
+ // angleText(textParagraph2, 0, 0.8, 0);
 
+ easycam.rotateX(0.0008*sin(frameCount/100));
+ easycam.rotateY(random(0,1)*0.0008*sin(frameCount/100));
+
+ console.log(sin(frameCount/100));
 }
 
 function enableCam(){
- easycam = createEasyCam();
+ easycam = createEasyCam(p5.RendererGL, {distance:200, center:[0,0,0]});
+ 
  camPos = easycam.getPosition();
  state = easycam.getState();
-}
-
-function angleText(text, x, y, z){
-  rotateText = createGraphics(windowWidth, windowHeight);
  
-  rotateText.fill(255,200,255);
-  rotateText.textFont(font);
-  rotateText.textAlign(LEFT);
-  rotateText.textSize(13);
-  rotateText.text(text, 0, windowHeight/2, windowWidth-20, windowHeight);
-  
-  normalMaterial();
-  push();
-
- translate(100, -200, 0.8);
-  //  rotateX(0.8 * cos(frameCount * 0.01));
-  //  rotateY(0.2 * sin(frameCount * 0.05));
-  //  rotateZ(0.2 * sin(frameCount * 0.005));
-  // rotateY(map(mouseX, 0, width, 0, 3));
-    rotateX(x);
-    rotateY(y);
-    rotateZ(z);
-  texture(rotateText);
-  plane(windowWidth+300, windowHeight+300);
-  pop();
 
 }
-function shuffleParagraph(textParagraph, textColor){
 
+
+
+function drawParagraph(textParagraph, textColor, textSpace){
   textFont(font);
   textSize(16);
 for (let i = 0; i < textParagraph.length; i++) {
   fill(textColor.r+i*20, textColor.g+i*20, textColor.b+i*20);
-  text(textParagraph[i], 0-0.5*windowWidth +10, i*80 - 0.5*windowHeight +30, windowWidth-20, windowHeight); // each paragraph is 80 in height
+  text(textParagraph[i], 0-0.5*windowWidth +10, i*textSpace - 0.5*windowHeight +30, windowWidth-20, windowHeight); // each paragraph is 80 in height
 } 
+}
+
+function bigText(AIText){
+  textSize(220);
+  fill('yellow');
+  textFont(font1);
+  text(AIText, 0-0.6*windowWidth, 20, windowWidth-20, windowHeight);
 }
 
  function keyPressed() {
   if (keyCode === RIGHT_ARROW) {
-   shuffle(textParagraph1, true);
-//   shuffle(textParagraph2, true);
+    currentPage ++;
   }
+  if (keyCode === LEFT_ARROW) {
+    currentPage --;
+  }
+  if (keyCode === DOWN_ARROW) {
+    shuffle(currentParagraph, true);
+  }  
+  switch (currentPage) {
+    case 0:
+      currentParagraph = textParagraph0;
+      textSpace = 80;
+      sentenceColor = sentenceColor1;
+      AIText = '';
+      spiral = 0;
+      break;
+    case 1:
+      currentParagraph = textParagraph0;
+      textSpace = 80;
+      sentenceColor = sentenceColor1;
+      AIText = '';
+      spiral = 1;
+      break;
+
+    case 2:
+      currentParagraph = textParagraph1;
+      textSpace = 80;
+      sentenceColor = sentenceColor1;
+      AIText = '';
+      spiral = 1;
+      break;
+    case 3:
+      currentParagraph = textParagraph2;
+      textSpace = 10;
+      sentenceColor = sentenceColor1;
+      AIText = '';
+      spiral = 0;
+      break;
+    case 4:
+      currentParagraph = textParagraphEmpty;
+      textSpace = 80;
+      sentenceColor = sentenceColor1;
+      AIText = 'A yeast that lactates';
+      spiral = 0;
+      break;
+
+        // case 3:
+    //   scene3();   
+    //   break;
+
+        // case 3:
+    //   scene3();   
+    //   break;
+    default:
+      //  
+  }
+
+  console.log(currentPage)
+
+
+
  }
 
 //让它们面向摄像机的方向
@@ -137,23 +202,23 @@ function chopSentences(){
   spiralCount = sentences.length;
 
   for (let i = 0; i < spiralCount; i++) {
-    let words = sentences[i].split(" ").reverse(); // 反转单词顺序
+    let words = sentences[i].split(",").reverse(); // 反转单词顺序
     //let words = sentences[i].split(" ");
     wordsArray.push(words);
   
     let graphics = [];
     let widths = []; // 为每个句子创建一个新的宽度数组
     
-    sentenceColor.r= random(0,255);
-    sentenceColor.g= random(0,255);
-    sentenceColor.b= random(0,255);
+    sentenceColor.r= random(100,255);
+    sentenceColor.g= random(100,255);
+    sentenceColor.b= random(100,255);
   
     for (let word of words) {
       let wordWidth = textWidth(word);
       //let gr = createGraphics(wordWidth, 30); //试图让每一个graphic的宽度等于每个单词的宽度，但是没有成功
-      let gr = createGraphics(150, 30);
+      let gr = createGraphics(180, 30);
       console.log(wordWidth);
-      gr.textSize(15);
+      gr.textSize(13);
       gr.textAlign(CENTER, CENTER);
       gr.fill(sentenceColor.r, sentenceColor.g, sentenceColor.b);
       gr.text(word, gr.width / 2, gr.height / 2);
@@ -182,7 +247,7 @@ function spiralVisual(){
 
     for (let j = 0; j < graphicsArray[i].length; j++) {
       let offset = j * 50;
-      let z = offset;
+      let z = -500 + offset;
       let angleOffset = angle * directionMultiplier + offset;
       let x = radius * cos(spiralAngle + angleOffset);
       let y = radius * sin(spiralAngle + angleOffset);
@@ -205,4 +270,40 @@ function spiralVisual(){
   }
 
   angle += speed;
+}
+
+function mousePressed() {
+  if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
+    let fs = fullscreen();
+    fullscreen(true);
+    
+  }
+}
+
+function angleText(textParagraph, x, y, z){
+  rotateText = createGraphics(windowWidth, windowHeight);
+ 
+  rotateText.fill(255,200,255);
+  rotateText.textFont(font);
+  rotateText.textAlign(LEFT);
+  rotateText.textSize(13);
+    for (let i = 0; i < textParagraph.length; i++) {
+   // fill(textColor.r+i*20, textColor.g+i*20, textColor.b+i*20);
+   rotateText.text(textParagraph[i], 0, 0.5*windowHeight+i*80, windowWidth-20, windowHeight); // each paragraph is 80 in height
+  } 
+  
+  normalMaterial();
+  push();
+
+ translate(100, -200, 0.8);
+  //  rotateX(0.8 * cos(frameCount * 0.01));
+  //  rotateY(0.2 * sin(frameCount * 0.05));
+  //  rotateZ(0.2 * sin(frameCount * 0.005));
+  // rotateY(map(mouseX, 0, width, 0, 3));
+    rotateX(x);
+    rotateY(y);
+    rotateZ(z);
+  texture(rotateText);
+  plane(windowWidth+300, windowHeight+300);
+  pop();
 }
