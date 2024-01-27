@@ -21,15 +21,15 @@ var sentenceColor = {
 }
 
 var sentenceColor1 = {
-  r: 0,
+  r: 128,
   g: 128,
-  b: 128,
+  b: 0,
 }
 
 var sentenceColor2 = {
   r: 128,
-  g: 128,
-  b: 0,
+  g: 0,
+  b: 128,
 }
 
 let camPos;
@@ -41,18 +41,29 @@ let currentParagraph;
 let textSpace;
 var allPage = [];
 let currentPage;
-let AIText = '';
+let AIText = 'Yeast that lactates';
 let spiral = 0;
+let particle = 0;
+let autoSuffle = 0;
+let scaleUp = 0;
+let getFrameCount = 0;
+
 
 
 function preload() {
   jsonData = loadJSON('json/Revision1.json');
+  textOraca = loadStrings('assets/orca.txt');
   textParagraph0 = loadStrings('assets/p_0.txt');
   textParagraph1 = loadStrings('assets/p_1.txt');
   textParagraph2 = loadStrings('assets/p_2.txt');
+  textParagraph3 = loadStrings('assets/p_3.txt');
+  textParagraph4 = loadStrings('assets/p_4.txt')
+  textglands = loadStrings('assets/glands.txt');
   textParagraphEmpty = '';
   font = loadFont("assets/Workbench-Regular.ttf"); 
   font1 = loadFont("assets/SI.ttf"); 
+  particleTable = loadTable("assets/1lfg.csv","csv");
+
 }
 
 
@@ -65,8 +76,10 @@ function setup() {
 
   enableCam();
 
+  createParticleSystem(particleTable);
+
   //initial setting
-  currentParagraph = textParagraph0;
+  currentParagraph = textParagraphEmpty;
   textSpace = 80;
   sentenceColor = sentenceColor1;
   currentPage = 0;
@@ -81,11 +94,19 @@ function draw() {
   }
   bigText(AIText);
  // angleText(textParagraph2, 0, 0.8, 0);
+  if (particle == 1){
+    createParticleSystem(particleTable);
+  }
+
+  if (autoSuffle ==1 && frameCount%200 == 10){
+    shuffle(currentParagraph, true);
+  }
 
  easycam.rotateX(0.0008*sin(frameCount/100));
  easycam.rotateY(random(0,1)*0.0008*sin(frameCount/100));
+ 
 
- console.log(sin(frameCount/100));
+// console.log(frameCount);
 }
 
 function enableCam(){
@@ -93,7 +114,6 @@ function enableCam(){
  
  camPos = easycam.getPosition();
  state = easycam.getState();
- 
 
 }
 
@@ -122,54 +142,134 @@ function bigText(AIText){
   if (keyCode === LEFT_ARROW) {
     currentPage --;
   }
-  if (keyCode === DOWN_ARROW) {
-    shuffle(currentParagraph, true);
+  if (keyCode === UP_ARROW) {
+    shuffle(currentParagraph, false);
   }  
   switch (currentPage) {
     case 0:
-      currentParagraph = textParagraph0;
-      textSpace = 80;
+      currentParagraph = textParagraphEmpty;
+      textSpace = 10;
       sentenceColor = sentenceColor1;
-      AIText = '';
+      AIText = 'Yeast that lactates';
       spiral = 0;
+      particle = 0; 
       break;
     case 1:
       currentParagraph = textParagraph0;
       textSpace = 80;
       sentenceColor = sentenceColor1;
       AIText = '';
-      spiral = 1;
+      spiral = 0;
+      particle = 0;
+      autoSuffle =1;
       break;
 
     case 2:
+        currentParagraph = textParagraph0;
+        textSpace = 80;
+        sentenceColor = sentenceColor1;
+        AIText = '';
+        spiral = 1;
+        particle = 0;
+        autoSuffle =1;
+        break;
+
+    case 3:
       currentParagraph = textParagraph1;
       textSpace = 80;
       sentenceColor = sentenceColor1;
       AIText = '';
       spiral = 1;
+      autoSuffle =1;
       break;
-    case 3:
-      currentParagraph = textParagraph2;
+    case 4:
+      currentParagraph = textOraca;
       textSpace = 10;
       sentenceColor = sentenceColor1;
       AIText = '';
       spiral = 0;
+      autoSuffle =0;
       break;
-    case 4:
+    case 5:
       currentParagraph = textParagraphEmpty;
-      textSpace = 80;
+      textSpace = 10;
       sentenceColor = sentenceColor1;
-      AIText = 'A yeast that lactates';
+      AIText = 'Milk is a proxy for milk.';
       spiral = 0;
+      particle = 0; 
       break;
 
-        // case 3:
-    //   scene3();   
-    //   break;
+   case 6:
+    currentParagraph = textglands;
+    textSpace = 10;
+    sentenceColor = sentenceColor1;
+    AIText = '';
+    spiral = 0;
+    autoSuffle =0; 
+       break;
 
-        // case 3:
-    //   scene3();   
-    //   break;
+    case 7:
+        currentParagraph = textParagraph2;
+        textSpace = 80;
+        sentenceColor = sentenceColor2;
+        AIText = '';
+        spiral = 0;
+        particle = 0;
+        autoSuffle =1;  
+           break;
+
+    case 8:
+      currentParagraph = textParagraph2;
+      textSpace = 80;
+      sentenceColor = sentenceColor2;
+      AIText = '';
+      spiral = 0;
+      particle = 1;
+      scaleUp = 0;
+     // getFrameCount = frameCount;
+      autoSuffle =1; 
+      break;
+    case 9:
+        currentParagraph = textParagraphEmpty;
+        textSpace = 80;
+        sentenceColor = sentenceColor2;
+        AIText = '';
+        spiral = 0;
+        particle = 1;
+        scaleUp = 1;
+        getFrameCount = frameCount;
+        autoSuffle =1; 
+        break;
+    case 10:
+          currentParagraph = textParagraph3;
+          textSpace = 80;
+          sentenceColor = sentenceColor2;
+          AIText = '';
+          spiral = 0;
+          particle = 0;
+          scaleUp = 0;
+          autoSuffle =1; 
+          break;
+   case 10:
+          currentParagraph = textParagraph4;
+          textSpace = 80;
+          sentenceColor = sentenceColor2;
+          AIText = '';
+          spiral = 0;
+          particle = 0;
+          scaleUp = 0;
+
+          autoSuffle =1; 
+
+    case 11:
+            currentParagraph = textParagraphEmpty;
+            textSpace = 80;
+            sentenceColor = sentenceColor2;
+            AIText = 'This is Milk.';
+            spiral = 0;
+            particle = 0;
+            scaleUp = 0;
+            autoSuffle =1;
     default:
       //  
   }
@@ -306,4 +406,68 @@ function angleText(textParagraph, x, y, z){
   texture(rotateText);
   plane(windowWidth+300, windowHeight+300);
   pop();
+}
+
+function createParticleSystem(table){
+  let xMax = 0;
+  let xMin = 0;
+  let yMax = 0;
+  let yMin = 0;
+  let zMax = 0;
+  let zMin = 0;
+
+  // first, create a bounding box around all points in the cloud
+  for (let i = 1; i < table.getRowCount(); i+= 1){
+    // parsefloat necessary to ensure values from file aren't compared as strings
+    let x = parseFloat(table.get(i,6));
+    let y = parseFloat(table.get(i,7));
+    let z = parseFloat(table.get(i,8));
+
+    if (x > xMax){
+      xMax = x;
+    }
+    if (x < xMin){
+      xMin = x;
+    }
+    if (y > yMax){
+      yMax = y;
+    }
+    if (y < yMin){
+      yMin = y;
+    }
+    if (z > zMax){
+      zMax = z;
+    }
+    if (z < zMin){
+      zMin = z;
+    }
+  }
+ // console.log('xMax,xMin,yMax,yMin,zMax,zMin:',xMax,xMin,yMax,yMin,zMax,zMin);
+  bbW = xMax-xMin;
+  bbH = parseFloat(yMax-yMin,2);
+  bbD = parseFloat(zMax-zMin,2);
+ // console.log('w/h/d of bounding box: ',bbW,'/',bbH,'/',bbD);
+
+  // use min/max values from bounding box to map everything around 0,0
+  for (let i = 0; i < table.getRowCount(); i+= 1){
+    
+    let x = parseFloat(table.get(i,6));
+    let y = parseFloat(table.get(i,7));
+    let z = parseFloat(table.get(i,8));
+    //console.log (x,y,z);
+    // map around 0,0 without scaling values
+
+    let scale = 4
+    if (scaleUp ==1){
+    scale = 4*(frameCount-getFrameCount)/100;
+    }
+
+
+    x = map(x, xMin,xMax,-bbW*scale,bbW*scale);
+    y = map(y, yMin,yMax,-bbH*scale,bbH*scale);
+    z = map(z, zMin,zMax,-bbD*scale,bbD*scale);
+    stroke(random(100,255),128,128);
+    strokeWeight(10);
+    point (x,y,z);
+  }
 }
